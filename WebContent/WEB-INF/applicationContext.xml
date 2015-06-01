@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	<!-- 定义数据源 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="url">
+			<value>jdbc:mysql://localhost/blog</value>
+		</property>
+		<property name="username">
+			<value>root</value>
+		</property>
+		<property name="password">
+			<value>root</value>
+		</property>
+		<!-- <property name="characterEncoding"> <value>utf8</value> </property> -->
+	</bean>
+	<!-- 定义sessionFactory -->
+	<!-- 定义SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>com/blog/po/User.hbm.xml</value>
+				<value>com/blog/po/BlogInfo.hbm.xml</value>
+				<value>com/blog/po/Article.hbm.xml</value>
+				<value>com/blog/po/Dianjiliang.hbm.xml</value>
+				<value>com/blog/po/Critique.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 定义hibernateTemplate -->
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<!-- 配置DAO组件 -->
+	<bean id="userDAO" class="com.blog.dao.UserDAOImpl">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate" />
+		</property>
+	</bean>
+
+	<!-- 配置业务逻辑组件 -->
+	<bean id="userService" class="com.blog.service.UserServiceImpl">
+		<property name="userDAO">
+			<ref bean="userDAO" />
+		</property>
+	</bean>
+	<!-- 配置registerAction -->
+	<bean id="registerAction" class="com.blog.action.Register" scope="prototype">
+		<property name="userService">
+			<ref bean="userService" />
+		</property>
+	</bean>
+
+	<!-- 配置loginAction -->
+	<bean id="loginAction" class="com.blog.action.Login">
+		<property name="userService">
+			<ref bean="userService" />
+		</property>
+	</bean>
+
+	<!-- 配置editblog DAO组件 -->
+	<bean id="blogInfoDAO" class="com.blog.dao.BlogInfoDAOImpl">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate" />
+		</property>
+	</bean>
+	<!-- 配置blogInfo的业务逻辑组建 -->
+	<bean id="blogInfoService" class="com.blog.service.BlogInfoServiceImpl">
+		<property name="blogInfoDAO">
+			<ref bean="blogInfoDAO" />
+		</property>
+	</bean>
+	<!-- 配置editBlogInfo action组建 -->
+	<bean id="editBlogInfo" class="com.blog.action.EditBlogInfo"
+		scope="prototype">
+		<property name="blogInfoService">
+			<ref bean="blogInfoService" />
+		</property>
+	</bean>
+
+	<!-- 配置getBlogInfo action组建 -->
+	<bean id="getBlogInfo" class="com.blog.action.GetBlogInfo" scope="prototype">
+		<property name="blogInfoService">
+			<ref bean="blogInfoService" />
+		</property>
+	</bean>
+
+	<!-- 配置article DAO组件 -->
+	<bean id="articleDAO" class="com.blog.dao.ArticleDAOImpl">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate" />
+		</property>
+	</bean>
+
+	<!-- 配置article 业务逻辑组建 -->
+	<bean id="articleService" class="com.blog.service.ArticleServiceImpl">
+		<property name="articleDAO">
+			<ref bean="articleDAO" />
+		</property>
+		   <property name="critiqueDAO">
+            <ref bean="critiqueDAO" />
+        </property>
+	</bean>
+	<!-- 配置addArticle -->
+	<bean id="addArticle" class="com.blog.action.AddArticle">
+		<property name="articleService">
+			<ref bean="articleService" />
+		</property>
+	</bean>
+	
+	<!-- 配置delete Article 同时级联删除Critique Action -->
+    <bean id="deleteArticle" class="com.blog.action.DeleteArticle">
+        <property name="articleService">
+            <ref bean="articleService" />
+        </property>
+    </bean>
+
+	<!-- 配置showUserAllArticle -->
+	<bean id="showUserAllArticle" class="com.blog.action.ShowUserAllArticle">
+		<property name="articleService">
+			<ref bean="articleService" />
+		</property>
+	</bean>
+
+	<!-- 配置showAllArticle 展示所有用户的文章 -->
+	<bean id="showAllArticle" class="com.blog.action.ShowAllArticle">
+		<property name="articleService">
+			<ref bean="articleService" />
+		</property>
+	</bean>
+	
+	<!-- 配置userManager 展示所有用户 -->
+    <bean id="showUser" class="com.blog.action.ShowUser">
+        <property name="userService">
+            <ref bean="userService" />
+        </property>
+    </bean>
+    
+    <!-- 配置userManager 展示所有用户的文章 -->
+    <bean id="deleteUser" class="com.blog.action.DeleteUser">
+        <property name="userService">
+            <ref bean="userService" />
+        </property>
+        <property name="userDAO">
+            <ref bean="userDAO" />
+        </property>
+    </bean>
+    
+
+	<!-- 配置DAO组件 dianjiliang -->
+	<bean id="dianjiliangDAO" class="com.blog.dao.DianjiliangDAOImpl">
+		<property name="hibernateTemplate">
+			<ref bean="hibernateTemplate" />
+		</property>
+	</bean>
+
+	<!-- 配置业务逻辑组件 dianjiliangService -->
+	<bean id="dianjiliangService" class="com.blog.service.DianjiliangServiceImpl">
+		<property name="djlDAO">
+			<ref bean="dianjiliangDAO" />
+		</property>
+	</bean>
+
+
+
+
+    <!-- 配置DAO组件 关于评论的 -->
+    <bean id="critiqueDAO" class="com.blog.dao.CritiqueDAOImpl">
+        <property name="hibernateTemplate">
+            <ref bean="hibernateTemplate" />
+        </property>
+    </bean>
+
+    <!-- 配置业务逻辑组件 关于评论的  -->
+    <bean id="critiqueService" class="com.blog.service.CritiqueServiceImpl">
+        <property name="critiqueDAO">
+            <ref bean="critiqueDAO" />
+        </property>
+    </bean>
+
+    <!-- 配置关于评论的 action -->
+    <bean id="addCritique" class="com.blog.action.AddCritique">
+        <property name="critiqueService">
+            <ref bean="critiqueService" />
+        </property>
+    </bean>
+
+
+    <!-- 配置showArticle base on id -->
+    <bean id="showArticle" class="com.blog.action.ShowArticle">
+        <property name="articleService">
+            <ref bean="articleService" />
+        </property>
+        <property name="dianjiliangService">
+            <ref bean="dianjiliangService" />
+        </property>
+         <property name="critiqueService">
+            <ref bean="critiqueService" />
+        </property>   
+        <property name="blogInfoService">
+            <ref bean="blogInfoService" />
+        </property>
+    </bean>
+    
+        <!-- 配置showRSS action -->
+    <bean id="showRSS" class="com.blog.action.ShowRSS">
+        <property name="articleService">
+            <ref bean="articleService" />
+        </property>     
+    </bean>
+    
+        <!-- 配置retPassword Action -->
+    <bean id="resetPasswordAction" class="com.blog.action.ResetPassword"  scope="prototype">
+        <property name="userService">
+            <ref bean="userService" />
+        </property>
+        
+         <property name="userDAO">
+            <ref bean="userDAO" />
+        </property>
+    </bean>
+    
+          <!-- 配置userManager Action -->
+    <bean id="userManagerAction" class="com.blog.action.UserManager"  scope="prototype">
+        <property name="userService">
+            <ref bean="userService" />
+        </property>
+        
+         <property name="userDAO">
+            <ref bean="userDAO" />
+        </property>
+    </bean>
+    
+    <bean id="resetUserInfoAction" class="com.blog.action.ResetUserInfo"  scope="prototype">
+         <property name="userDAO">
+            <ref bean="userDAO" />
+        </property>
+    </bean>
+    
+</beans>

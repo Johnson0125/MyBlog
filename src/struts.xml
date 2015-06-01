@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+	"http://struts.apache.org/dtds/struts-2.0.dtd">
+<!-- 指定Struts 2配置文件的根元素 -->
+<struts>
+	<constant name="struts.devMode" value="true" />
+
+	<!-- 指定国际化编码所使用的字符集 -->
+	<constant name="struts.i18n.encoding" value="utf-8" />
+	<constant name="struts.custom.i18n.resources" value="myMessage"></constant>
+	   
+	<!-- 所有的Action定义都应该放在package下 -->
+	<package name="struts2" extends="struts-default">
+	   <interceptors>
+	       <interceptor name="userInterceptor" class="com.blog.interceptor.UserInterceptor"></interceptor>
+	   </interceptors>
+	
+		<action name="register" class="registerAction">
+			<result name="success">/success.jsp</result>
+			<result name="error">/error.jsp</result>
+			<result name="input">/register.jsp</result>
+		</action>
+		
+		
+
+		<action name="login" class="loginAction">
+			<result name="success">/success.jsp</result>
+			<result name="error">/error.jsp</result>
+			<result name="input">/login.jsp</result>
+		</action>
+		
+		<!-- 管理员登录-->
+	    <action name="adminLogin" class="com.blog.action.AdminLogin">
+            <result name="success">/success.jsp</result>
+            <result name="input">/login.jsp</result>
+        </action>
+
+		<action name="editBlogInfo" class="editBlogInfo">
+			<result name="success" type="chain">getBlogInfo</result>
+			<result name="error">/error.jsp</result>
+			<result name="input">/user/editbloginfo.jsp</result>
+		</action>
+
+		<action name="getBlogInfo" class="getBlogInfo">
+			<result name="success">/user/editbloginfo.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="addArticle" class="addArticle">
+			<result name="success" type="chain">showUserAllArticle</result>
+			<result name="error">/error.jsp</result>
+			<result name="login" type="redirect">/login.jsp</result>
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+			<interceptor-ref name="userInterceptor"></interceptor-ref>
+		</action>
+		
+		
+           <!-- 配置用户 deleteArticle的Action操作 -->
+        <action name="deleteArticle" class="deleteArticle">
+            <result name="success" type="chain">showUserAllArticle</result>
+        </action>
+        
+          <!-- 配置admin 的deleteArticle的Action操作 -->
+        <action name="deleteArticle_Admin" class="deleteArticle">
+            <result name="success" type="chain">showAllArticle_Admin</result>
+        </action>
+        
+        
+		<action name="showUserAllArticle" class="showUserAllArticle">
+			<result name="success">/user/showUserAllArticle.jsp</result>
+		</action>
+
+		<action name="showAllArticle" class="showAllArticle">
+			<result name="success">/showAllArticle.jsp</result>
+		</action>
+
+        <action name="showAllArticle_Admin" class="showAllArticle">
+            <result name="success">/admin/showAllArticle.jsp</result>
+        </action>
+        
+       <!-- 管理员对用户的管理
+        <action name="userManager" class="userManager">
+            <result name="success">/admin/userManager.jsp</result>
+        </action>   -->
+        
+          <!-- 管理员对用户的管理 -->
+        <action name="showUser" class="showUser">
+            <result name="success">/admin/showUser.jsp</result>
+        </action>
+
+          <!-- 管理员对用户的管理  删除-->
+        <action name="deleteUser" class="deleteUser">
+            <result name="success" type="chain">showUser</result>
+        </action>
+        
+        
+		<action name="showArticle" class="showArticle">
+			<result name="success">/user/showArticle_1.jsp</result>
+		</action>
+
+		<action name="addCritique" class="addCritique">
+			<result name="success" type="chain">showArticle</result>
+		</action>
+
+		<action name="photoUpload" class="com.blog.action.PhotoUpload">
+			<result name="success" type="chain">showPhoto</result>
+			<result name="input">/user/showphoto.jsp</result>
+			<result name="login" type="redirect">/login.jsp</result>
+			<interceptor-ref name="fileUpload">
+				<!-- 配置允许上传文件类型 -->
+				<param name="allowedTypes">image/bmp,image/pjpeg,image/gif,image/png</param>
+				<!-- 配置允许上传文件大小最大值 
+				<param name="maximumSize">512000</param>  -->
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+			<interceptor-ref name="userInterceptor"></interceptor-ref>
+		</action>
+		
+	    <action name="showPhoto" class="com.blog.action.ShowPhoto">
+            <result name="success">/user/showphoto.jsp</result>
+        </action>
+        
+        <action name="showRSS" class="showRSS">
+            <result name="success">/rss.xml</result>
+        </action>
+        
+       <!-- 重置密码 -->
+        <action name="resetPassword" class="resetPasswordAction">
+            <result name="success">success.jsp</result>
+            <result name="error">resetPassword.jsp</result>
+            <result name="input">resetPassword.jsp</result>
+        </action>
+        
+         <!-- 管理员对用户信息的修改之前的读取 -->
+        <action name="userManager" class="userManagerAction">
+            <result name="success">userManager.jsp</result>
+        </action>
+        
+           <!-- 管理员对用户信息的读取之后的修改 -->
+        <action name="resetUserInfo" class="resetUserInfoAction">
+            <result name="success" type="chain">showUser</result>
+        </action>
+       
+	</package>
+</struts>
